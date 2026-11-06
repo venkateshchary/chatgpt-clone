@@ -1,0 +1,21 @@
+services:
+  web:
+      build: .
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./app:/code/app
+      environment:
+        - ENV=development
+  db:
+    image: pgvector/pgvector:pg16   # Postgres 16 + pgvector (for memory embeddings later)
+    environment:
+      POSTGRES_USER: chat
+      POSTGRES_PASSWORD: chat
+      POSTGRES_DB: chatdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
