@@ -1,21 +1,53 @@
 services:
-  web:
-      build: .
+  backend:
+      build:
+        context: ./backend
+        dockerfile: Dockerfile
+      container_name: chatgpt_backend
+      restart: unless-stopped
       ports:
         - "8000:8000"
-      volumes:
-        - ./app:/code/app
       environment:
         - ENV=development
+        - APP_MODULE=app.main:app
+        - DATABASE_URL=postgresql+asyncpg://chat:chat@db:5432/chatdb
+        - OLLAMA_URL=http://host.docker.internal:11434
+        # Add your database connections or environment keys here:
+        # - DATABASE_URL=postgresql+asyncpg://user:pass@db:5432/dbname
+      volumes:
+        # Mounts the local code folder into the container to enable instant hot-reloading
+        - ./backend/app:/code/app
+      networks:
+        - app_network
+      extra_hosts:
+        - "host.docker.internal:host-gateway"   # needed on Linux; harmless on Mac/Windows
+      depends_on:
+        db:
+          condition: service_healthy
+
   db:
-    image: pgvector/pgvector:pg16   # Postgres 16 + pgvector (for memory embeddings later)
-    environment:
-      POSTGRES_USER: chat
-      POSTGRES_PASSWORD: chat
-      POSTGRES_DB: chatdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      image: pgvector/pgvector:pg16   # Postgres 16 + pgvector (for memory embeddings later)
+      container_name: chatgpt_db
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: chat
+        POSTGRES_PASSWORD: chat
+        POSTGRES_DB: chatdb
+      ports:
+        - "5432:5432"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U chat -d chatdb"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+      networks:
+        - app_network
+
 volumes:
   pgdata:
+
+networks:
+  app_network:
+    driver: bridge
