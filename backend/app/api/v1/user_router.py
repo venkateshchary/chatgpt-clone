@@ -10,7 +10,7 @@ router = APIRouter(prefix="/users", tags=["Users V1"])
 
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def create_user_v1(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
     return await user_service.register_user(user_in)

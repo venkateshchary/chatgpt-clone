@@ -13,7 +13,7 @@ router = APIRouter(prefix="/conversations", tags=["conversations"])
 
 
 # Define a clean resource prefix
-router = APIRouter(prefix="/users", tags=["Users V1"])
+router = APIRouter(prefix="/conversation", tags=["Conversation"])
 
 
 

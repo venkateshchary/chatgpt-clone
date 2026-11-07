@@ -6,3 +6,4 @@ v1_router = APIRouter()
 
 # Include feature routers here. This acts as the single point of entry for V1.
 v1_router.include_router(router)
+# v1_router.include_router(user_router)
