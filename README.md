@@ -25,3 +25,10 @@ alembic revision -m "message"
 ```shell
 alembic upgrade head
 ```
+
+## Ollama
+
+#### Model
+```shell
+docker compose exec ollama ollama pull llama3.2:3b
+```
